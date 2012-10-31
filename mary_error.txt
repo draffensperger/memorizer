@@ -1,0 +1,18 @@
+sounds/Brotkörbe.wavsounds/du siehst.wavsounds/Ostfriesland.wavSat, 07 Apr 2007 16:12:21 CDT: ERROR - Processing failed.
+java.lang.NullPointerException: Document does not have a paragraph
+Sat, 07 Apr 2007 16:12:51 CDT: ERROR - Processing failed.
+java.lang.NullPointerException: Document does not have a paragraph
+Sat, 07 Apr 2007 16:13:38 CDT: ERROR - Processing failed.
+java.lang.NullPointerException: Document does not have a paragraph
+Sat, 07 Apr 2007 16:14:19 CDT: ERROR - Processing failed.
+java.lang.NullPointerException: Document does not have a paragraph
+Sat, 07 Apr 2007 16:14:46 CDT: ERROR - Processing failed.
+java.lang.NullPointerException: Document does not have a paragraph
+Sat, 07 Apr 2007 16:15:06 CDT: ERROR - Processing failed.
+java.lang.NullPointerException: Document does not have a paragraph
+Sat, 07 Apr 2007 16:15:25 CDT: ERROR - Processing failed.
+java.lang.NullPointerException: Document does not have a paragraph
+Sat, 07 Apr 2007 16:15:37 CDT: ERROR - Processing failed.
+java.lang.NullPointerException: Document does not have a paragraph
+Sat, 07 Apr 2007 16:16:12 CDT: ERROR - Processing failed.
+java.lang.NullPointerException: Document does not have a paragraph

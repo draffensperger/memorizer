@@ -1,0 +1,38 @@
+ALTER VIEW `memoryitempriority` AS 
+SELECT 
+memoryitem.DataText,
+memoryitem.CueText,
+CASE 
+	WHEN memoryhistory.NumForwardTested IS NULL THEN 'Untested'
+	WHEN memoryhistory.NumPracticeTimesNeeded > 0 THEN 'NeedsPractice'
+	WHEN ((memoryhistory.NumForwardCorrect + memoryhistory.NumBackwardCorrect) / 
+		(memoryhistory.NumForwardTested + memoryhistory.NumBackwardTested)) < memoryset.MinCorrectnessRatio THEN 'Unlearned'	
+	ELSE 'Learned'
+END AS Category,
+CASE 
+	WHEN memoryhistory.NumForwardTested IS NULL THEN 3
+	WHEN memoryhistory.NumPracticeTimesNeeded > 0 THEN 0
+	WHEN ((memoryhistory.NumForwardCorrect + memoryhistory.NumBackwardCorrect) / 
+		(memoryhistory.NumForwardTested + memoryhistory.NumBackwardTested)) < memoryset.MinCorrectnessRatio THEN 1
+	ELSE 2
+END AS CategoryRank,
+CASE WHEN memoryhistory.NumForwardTested IS NULL THEN 0 
+ELSE
+((memoryhistory.NumForwardCorrect + memoryhistory.NumBackwardCorrect) / 
+		(memoryhistory.NumForwardTested + memoryhistory.NumBackwardTested))
+END
+AS CorrectnessRatio,
+memoryitem.MemoryItemID,
+memoryitem.MemorySetID,
+memoryhistory.UserID,
+IFNULL(memoryhistory.NumForwardTested, 0) AS NumForwardTested,
+IFNULL(memoryhistory.NumForwardCorrect, 0) AS NumForwardCorrect,
+IFNULL(memoryhistory.NumBackwardTested, 0) AS NumBackwardTested,
+IFNULL(memoryhistory.NumBackwardCorrect, 0) AS NumBackwardCorrect,
+IFNULL(memoryhistory.NumCorrectInARow, 0) AS NumCorrectInARow,
+memoryhistory.LastTimeTested,
+memoryhistory.NumPracticeTimesNeeded
+FROM memoryitem 
+LEFT JOIN memoryhistory ON memoryitem.MemoryItemID = memoryhistory.MemoryItemID
+INNER JOIN memoryset ON memoryset.MemorySetID = memoryitem.MemorySetID
+ORDER BY memoryhistory.LastTimeTested DESC
