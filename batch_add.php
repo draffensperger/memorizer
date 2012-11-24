@@ -9,16 +9,14 @@ define("BACKWARD", 2);
 define("TEST_FORM_BODY_ONLOAD", 'document.memoryTestForm.guess.focus();');
 define("RETRY_FORM_BODY_ONLOAD", 'document.retryForm.retestButton.focus();');
 
-while (list($name, $value) = each($HTTP_POST_VARS)) { $input[$name] = stripslashes($value); }
-while (list($name, $value) = each($HTTP_GET_VARS)) { $input[$name] = stripslashes($value); }
 openDBConn();
 printPage($input);
 closeDBConn();
 
 function printPage($input) {
-  if ($input['newitems'] != '') {
+  if (getInput('newitems') != '') {
   	addItemsAndPrintConfirmation($input);
-	} else if ($input['MemorySetID'] != '') {
+	} else if (getInput('MemorySetID') != '') {
 	  printAddMemoryItemsPage($input);
 	} else {
 	  printSelectMemorySetPage($input);
@@ -54,7 +52,7 @@ function printAddMemoryItemsPage($input) {
   echo "The format should be [Data Text] [: or tab] [Cue Text]. Cue Order is assumed to be 1 for all of them.<br>";  
   echo "<form method=POST>\n";
   echo "<textarea name=\"newitems\" rows=30 cols=80></textarea><br>";
-  echo "<input type=hidden name=MemorySetID value=\"" . $input['MemorySetID'] . "\">";
+  echo "<input type=hidden name=MemorySetID value=\"" . getInput('MemorySetID') . "\">";
   echo "<input type=submit value=\"Add Items\">";
   echo "</form>\n";
  	printPageFooter();  
@@ -63,14 +61,14 @@ function printAddMemoryItemsPage($input) {
 function addItemsAndPrintConfirmation($input) {
 	printPageHeader();    
   
-  $newItemsStr = $input['newitems'];
-	$memorySetID = $input['MemorySetID'];
+  $newItemsStr = getInput('newitems');
+	$memorySetID = getInput('MemorySetID');
 	$newItemLines = explode("\n", $newItemsStr);
 	
 	echo "Here are the results of the batch add:<br>\n";
 	echo "<table><tr><th>Data Text</th><th>Cue Text</th><th>Add Status</th></tr>\n";
 	foreach ($newItemLines as $newItemLine) {	
-	  list($dataText, $cueText) = split("[/\t\:]", $newItemLine);	 
+	  list($dataText, $cueText) = split("[/\t\:]", $newItemLine);
 		$dataText = trim($dataText);
 		$cueText = trim($cueText); 
 

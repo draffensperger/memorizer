@@ -1,0 +1,12 @@
+
+Fix shorthand:
+<\?=(.+)\?>
+<\?php echo($1); \?>
+
+Fix $input variable:
+\$input\[(.+)\]
+getInput\($1\)
+
+Don't pass $input to functions:
+\(\$input\)
+\(\)

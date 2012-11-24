@@ -2,25 +2,26 @@
 # This code calls the Mary TTS Server to to Text-to-Speech
 # See the appropriate licenses for the Mary system.
 
-header('Content-type: audio/wav');
-header('Content-disposition: inline');
+#header('Content-type: audio/wav');
+#header('Content-disposition: inline');
 
 # There will be warnings saying that you should not connect
 # to the same IP address and port twice with two different sockets, but
 # this is necessary for communicating with the Mary TTS server.
-error_reporting(1);
+#error_reporting(1);
 
-while (list($name, $value) = each($HTTP_POST_VARS)) { $input[$name] = stripslashes($value); }
-while (list($name, $value) = each($HTTP_GET_VARS)) { $input[$name] = stripslashes($value); }
+#while (list($name, $value) = each($HTTP_POST_VARS)) { $input[$name] = stripslashes($value); }
+#while (list($name, $value) = each($HTTP_GET_VARS)) { $input[$name] = stripslashes($value); }
 
 #$host = "cling.dfki.uni-sb.de";
 $host = "localhost";
 $port = 59125;
 
 $in  = "TEXT_DE";
-if ($input['in'] != '') {
-  $in = $input['in'];
+if ($_GET['in'] != '') {
+  $in = $_GET['in'];
 }
+echo $in;
 
 $out = "AUDIO";
 #$audiotype = "MP3";
@@ -31,10 +32,11 @@ if ($input['voice'] != '') {
   $voice = $input['voice'];
 }
 
-$outfilename = $input['outfile'];
+$outfilename = $_GET['outfile'];
 if ($outfilename != '') {
   $outfile = fopen($outfilename, "w+");
 }
+
 
 $text = $input['text'];
 
@@ -57,7 +59,7 @@ $msg = "MARY IN=$in OUT=$out AUDIO=$audiotype";
 if ($voice) { 
   $msg .= " VOICE=$voice"; 
 }
-$msg .= "\015\012";
+#$msg .= "\015\012";
 
 # Send our format request
 socket_send($maryInfoSocket, $msg, strlen($msg), 0);

@@ -1,10 +1,27 @@
 <?php
 
+$input = $_REQUEST;
+
 include 'util.php';
 
-while (list($name, $value) = each($HTTP_POST_VARS)) { $input[$name] = stripslashes($value); }
-while (list($name, $value) = each($HTTP_GET_VARS)) { $input[$name] = stripslashes($value); }
-$memorySetID = $input['MemorySetID'];
+//while (list($name, $value) = each($_POST)) { $input[$name] = stripslashes($value); }
+//while (list($name, $value) = each($_GET)) { $input[$name] = stripslashes($value); }
+
+$memorySetID = getInput('MemorySetID');
+
+function getInput($param) {
+    global $input;
+    if (array_key_exists($param, $input)) {
+        return $input[$param];
+    } else {
+        return '';
+    }
+}
+
+function setInput($param, $value) {
+    global $input;
+    $input[$param] = $value;
+}
 	 
 function printSiteHeader($whichSection, $bodyOnLoad = '', $requiredFields = array(), $additionalValidation = '') {     
    global $section;
@@ -29,15 +46,15 @@ function printSiteHeader($whichSection, $bodyOnLoad = '', $requiredFields = arra
 		    $prettyField = ucwords(str_replace("_", " ", $requiredField));
 		    ?>
 
-		    if (isUndefined(formObject.<?=$requiredField?>.value)) {
-			  	if (!validateRadioButton(formObject.<?=$requiredField?>, '<?=$prettyField?>')) {
+		    if (isUndefined(formObject.<?php echo($requiredField); ?>.value)) {
+			  	if (!validateRadioButton(formObject.<?php echo($requiredField); ?>, '<php? echo($prettyField); ?>')) {
 			  	  return false;
 			  	}   		      	
    		    }   		    
    		    
-			if (formObject.<?=$requiredField?>.value == '') {
-   		      	alert('Please enter a value for <?=$prettyField?>');				  
-		      	formObject.<?=$requiredField?>.focus();
+			if (formObject.<?php echo($requiredField); ?>.value == '') {
+   		      	alert('Please enter a value for <?php echo($prettyField); ?>');				  
+		      	formObject.<?php echo($requiredField); ?>.focus();
 		      	return false;
 		    }		    
 		    
@@ -45,7 +62,7 @@ function printSiteHeader($whichSection, $bodyOnLoad = '', $requiredFields = arra
 		  }		  		  
 		  ?>
 		  
-		  <?=$additionalValidation?>
+		  <?php echo($additionalValidation); ?>
 		  
 		  return true;
 	  }
@@ -75,7 +92,7 @@ function printSiteHeader($whichSection, $bodyOnLoad = '', $requiredFields = arra
    </script>
 </HEAD>
 
-<BODY onload="<?=$bodyOnLoad?>">
+<BODY onload="<?php echo($bodyOnLoad); ?>">
 <center>
 <table cellspacing="0" cellpadding="0" border="0" width="730">
 <tr>
@@ -89,15 +106,15 @@ function printSiteHeader($whichSection, $bodyOnLoad = '', $requiredFields = arra
 		<ul id="menu">
 			<li class="<?php echo sectionType('home'); ?>"><a href="index.php">Select List</a></li>
 			<li class="<?php echo sectionType('test'); ?>">
-				<a href="test.php?MemorySetID=<?=$memorySetID?>">Test</a></li>						
+				<a href="test.php?MemorySetID=<?php echo($memorySetID); ?>">Test</a></li>						
 			<li class="<?php echo sectionType('add'); ?>">
-				<a href="add.php?MemorySetID=<?=$memorySetID?>">Add Item</a></li>						
+				<a href="add.php?MemorySetID=<?php echo($memorySetID); ?>">Add Item</a></li>						
 			<li class="<?php echo sectionType('batch_add'); ?>">
-				<a href="batch_add.php?MemorySetID=<?=$memorySetID?>">Batch Add</a></li>							
+				<a href="batch_add.php?MemorySetID=<?php echo($memorySetID); ?>">Batch Add</a></li>							
 			<li class="<?php echo sectionType('view'); ?>">
-				<a href="view.php?MemorySetID=<?=$memorySetID?>">View Items</a></li>			
+				<a href="view.php?MemorySetID=<?php echo($memorySetID); ?>">View Items</a></li>			
 			<li class="<?php echo sectionType('stats'); ?>">
-				<a href="stats.php?MemorySetID=<?=$memorySetID?>">Statistics</a></li>									
+				<a href="stats.php?MemorySetID=<?php echo($memorySetID); ?>">Statistics</a></li>									
 			<li class="<?php echo sectionType('about'); ?>">
 				<a href="about.php">About Us</a></li>
 		</ul>

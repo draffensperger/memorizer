@@ -1,9 +1,6 @@
 <?php 
 include 'functions.php';
 
-while (list($name, $value) = each($HTTP_POST_VARS)) { $input[$name] = stripslashes($value); }
-while (list($name, $value) = each($HTTP_GET_VARS)) { $input[$name] = stripslashes($value); }
-
 openDBConn();
 printPage();
 closeDBConn();
@@ -12,10 +9,10 @@ function printPage() {
   printSiteHeader('home');
 	echo "<div style=\"height:600px\">\n"; 	  
 
-	if ($input['MemorySetID'] == '') {
-	  printSelectMemorySetPage($input);
+	if (getInput('MemorySetID') == '') {
+	  printSelectMemorySetPage();
 	} else {
-	  $memorySetName = getSQLScalar('SELECT MemorySetName FROM memoryset WHERE MemorySetID = ' . dbVal($input['MemorySetID']));
+	  $memorySetName = getSQLScalar('SELECT MemorySetName FROM memoryset WHERE MemorySetID = ' . dbVal(getInput('MemorySetID')));
 	  echo 'Select an action on the left for memory set ' . $memorySetName;
 	}
 	?>
@@ -27,7 +24,7 @@ function printPage() {
 }
 
 
-function printSelectMemorySetPage($input) {
+function printSelectMemorySetPage() {
   echo "<h1>Select Memory Set</h1>\n";
   $memory_sets = getSQLRows('SELECT MemorySetID, MemorySetName FROM memoryset');
  

@@ -6,19 +6,17 @@ include 'functions.php';
 define("FORWARD", 1);
 define("BACKWARD", 2);
 
-while (list($name, $value) = each($HTTP_POST_VARS)) { $input[$name] = stripslashes($value); }
-while (list($name, $value) = each($HTTP_GET_VARS)) { $input[$name] = stripslashes($value); }
 openDBConn();
 printPage($input);
 closeDBConn();
 
 function printPage($input) {
-	if ($input['MemorySetID'] == '') {
+	if (getInput('MemorySetID') == '') {
 		printSelectMemorySetPage($input);
 	} else {
 	  printPageHeader('document.inputform.datatext.focus();');  
 
-  	if ($input['datatext'] != '') {
+  	if (getInput('datatext') != '') {
   		addItemsAndPrintConfirmation($input);
 		}
 		
@@ -60,15 +58,15 @@ function printAddMemoryItemsPage($input) {
 	echo "<td><input size=30 type=text name=\"cuetext\" autocomplete=\"off\"></td></tr>\n";
   echo "</table>\n";
 
-  echo "<input type=hidden name=MemorySetID value=\"" . $input['MemorySetID'] . "\">";
+  echo "<input type=hidden name=MemorySetID value=\"" . getInput('MemorySetID') . "\">";
   echo "<input type=submit value=\"Add Item\">";
   echo "</form>\n";
 }
 
 function addItemsAndPrintConfirmation($input) {		
-	$dataText = $input['datatext'];
-	$cueText = $input['cuetext']; 
-	$memorySetID = $input['MemorySetID']; 
+	$dataText = getInput('datatext');
+	$cueText = getInput('cuetext'); 
+	$memorySetID = getInput('MemorySetID'); 
 	
 	if ($dataText != '' && $cueText != '') {
 	  $sql = 'SELECT COUNT(*) FROM MemoryItem ' .

@@ -2,6 +2,7 @@
 /******************************** Main Code Section *****************************************/
 
 include 'functions.php';
+include 'mary_embed.php';
 
 define("FORWARD", 1);
 define("BACKWARD", 2);
@@ -9,24 +10,22 @@ define("BACKWARD", 2);
 define("TEST_FORM_BODY_ONLOAD", 'writeSound(); ');
 define("RETRY_FORM_BODY_ONLOAD", 'writeSound(); ');
 
-while (list($name, $value) = each($HTTP_POST_VARS)) { $input[$name] = stripslashes($value); }
-while (list($name, $value) = each($HTTP_GET_VARS)) { $input[$name] = stripslashes($value); }
 openDBConn();
-printPage($input);
+printPage();
 closeDBConn();
 
-function printPage($input) { 
-	if ($input['correctAnswer'] != '') { 
-	  printTestResultsPage($input);
-	} else if ($input['MemoryItemIDs'] != '') {
-	  //printCurrentMemoryCuePage($input);
-	  $memoryItemIDs = explode(";", $input['MemoryItemIDs']);
-	  $input['MemorySetID'] = getSQLScalar('SELECT MemorySetID FROM memoryitem WHERE MemoryItemID = ' . $memoryItemIDs[0]);
-	  printNextMemoryCuePage($input);
-	} else if ($input['MemorySetID'] != '') {
-	  printNextMemoryCuePage($input);
+function printPage() { 	
+	if (getInput('correctAnswer') != '') { 
+	  printTestResultsPage();
+	} else if (getInput('MemoryItemIDs') != '') {
+	  //printCurrentMemoryCuePage();
+	  $memoryItemIDs = explode(";", getInput('MemoryItemIDs'));
+	  setInput('MemorySetID', getSQLScalar('SELECT MemorySetID FROM memoryitem WHERE MemoryItemID = ' . $memoryItemIDs[0]));
+	  printNextMemoryCuePage();
+	} else if (getInput('MemorySetID') != '') {
+	  printNextMemoryCuePage();
 	} else {
-	  printSelectMemorySetPage($input);
+	  printSelectMemorySetPage();
 	}
 }
 
@@ -42,7 +41,7 @@ function printPageFooter() {
 
 /******************************** Page Print Functions *****************************************/
 
-function printSelectMemorySetPage($input) {
+function printSelectMemorySetPage() {
   printPageHeader();
   echo "<h1>Select Memory Set</h1>\n";
   $memory_sets = getSQLRows('SELECT MemorySetID, MemorySetName FROM memoryset');
@@ -53,8 +52,8 @@ function printSelectMemorySetPage($input) {
 	printPageFooter();
 }
 
-function printStatistics($input) {
-  $memorySetID = $input['MemorySetID'];
+function printStatistics() {
+  $memorySetID = getInput('MemorySetID');
   $userID = getUserID();
   
   $sql = 'SELECT Category, COUNT(*) AS CategoryCount FROM memoryitempriority ' . 
@@ -79,7 +78,7 @@ function printStatistics($input) {
 	}
 	echo 'Stats: ' . $learned . ' + ' . ($unlearned + $needsPractice) . ' / ' . ($untested + $unlearned + $learned + $needsPractice);
 	
-	$quizMode = $input['quizMode'];
+	$quizMode = getInput('quizMode');
 	if ($quizMode == 1) {
 	  $quizStartTime = getSQLScalar('SELECT QuizStartTime FROM memoryset WHERE MemorySetID = ' . dbVal($memorySetID));
 	  $numQuizzed = getSQLScalar(
@@ -97,18 +96,18 @@ function printStatistics($input) {
 	echo '</small>';
 }
 
-function printNextMemoryCuePage($input) {
+function printNextMemoryCuePage() {
   printPageHeader(TEST_FORM_BODY_ONLOAD);  
 
-	$memorySetID = $input['MemorySetID'];
-  $quizMode = $input['quizMode'];
+	$memorySetID = getInput('MemorySetID');
+  $quizMode = getInput('quizMode');
 
-  if ($input['restartQuiz'] == 1) {
+  if (getInput('restartQuiz') == 1) {
     $sql = 'UPDATE memoryset SET QuizStartTime = NOW() WHERE MemorySetID = ' . dbVal($memorySetID);
     execSQL($sql);
   }  
   
-  printStatistics($input);    
+  printStatistics();    
 
   $nextMemoryItemAndDir = getNextMemoryItemAndDirection(getUserID(), $memorySetID, $quizMode);
   $nextMemoryItem = $nextMemoryItemAndDir[0];
@@ -118,13 +117,13 @@ function printNextMemoryCuePage($input) {
   printPageFooter();
 }
 
-function printCurrentMemoryCuePage($input) {
+function printCurrentMemoryCuePage() {
   printPageHeader(TEST_FORM_BODY_ONLOAD);  
-	$memoryItemIDs = explode(";", $input['MemoryItemIDs']);
+	$memoryItemIDs = explode(";", getInput('MemoryItemIDs'));
 	$memoryItemID = $memoryItemIDs[0];
-	$quizMode = $input['quizMode'];	
+	$quizMode = getInput('quizMode');	
 
-  //$direction = $input['direction'];
+  //$direction = getInput('direction');
   echo 'Not supposed to be here!!!';
 
   $nextMemoryItemAndDir = getMemoryItemAndDirectionFromID($memoryItemID, $direction);
@@ -136,20 +135,20 @@ function printCurrentMemoryCuePage($input) {
   printPageFooter();
 }
 
-function printTestResultsPage($input) {  	    
-  $guesses = explode(";", $input['guess']);
+function printTestResultsPage() {  	    
+  $guesses = explode(";", getInput('guess'));
   $guesses = array_map('trim', $guesses);
   sort($guesses);
   $guess = implode("; ", $guesses);    
   
-  $correctAnswer = $input['correctAnswer'];
-  $cue = $input['cue'];	  	  
-  $direction = $input['direction'];      
-  $memoryItemIDs = explode(";", $input['MemoryItemIDs']);
-  $memorySetID = $input['MemorySetID'];
+  $correctAnswer = getInput('correctAnswer');
+  $cue = getInput('cue');	  	  
+  $direction = getInput('direction');      
+  $memoryItemIDs = explode(";", getInput('MemoryItemIDs'));
+  $memorySetID = getInput('MemorySetID');
   $isCorrect = guessMatchesAnswer($guess, $correctAnswer);    
   
-  $quizMode = $input['quizMode'];
+  $quizMode = getInput('quizMode');
   
   if ($isCorrect) {
 	  printPageHeader(TEST_FORM_BODY_ONLOAD);
@@ -161,7 +160,7 @@ function printTestResultsPage($input) {
 		updateHistory(getUserID(), $isCorrect, $direction, $memoryItemID);    
 	}
 	
-	printStatistics($input);
+	printStatistics();
   
   if ($isCorrect) {
     $nextMemoryItemAndDir = getNextMemoryItemAndDirection(getUserID(), $memorySetID, $quizMode);
@@ -344,8 +343,8 @@ function printAlternateAnswers($guessText, $memoryItemIDs, $memorySetID, $correc
 			  if ($row != false) {
 				  ?>
 				  <tr>
-					  <td><span class="bigletters"><?=formatCue($dataText)?></span></td>				  
-					  <td><span class="bigletters">&nbsp;&nbsp;<?=formatCue($cueTextsMap[$dataText])?></span></td>
+					  <td><span class="bigletters"><?php echo(formatCue($dataText)); ?></span></td>				  
+					  <td><span class="bigletters">&nbsp;&nbsp;<?php echo(formatCue($cueTextsMap[$dataText])); ?></span></td>
 				  </tr>
 				  <?php		  
 				  array_push($alternateMemoryItemIDs, $row['MemoryItemID']);
@@ -356,7 +355,7 @@ function printAlternateAnswers($guessText, $memoryItemIDs, $memorySetID, $correc
 			$memoryItemIDsText = implode(';', $alternateMemoryItemIDs);
 		  ?>
 		  </table>
-		  <a href="edit.php?MemoryItemIDs=<?=$memoryItemIDsText?>">Edit these</a>
+		  <a href="edit.php?MemoryItemIDs=<?php echo($memoryItemIDsText); ?>">Edit these</a>
 		  <?php		
 		}
 	}
@@ -374,16 +373,16 @@ function printResultTable($isCorrect, $cue, $guess, $correctAnswer, $memoryItemI
   list($guessFormatting, $answerFormatting) = formatGuessAndAnswer($guess, $correctAnswer);
 	
   ?>
-  <h1>Previous result: <?=$correctnessString?></h1>
+  <h1>Previous result: <?php echo($correctnessString); ?></h1>
 	<table>
-	<tr><td><span class="bigletters">Cue</span></td><td><span class="bigletters"><?=formatCue($cue)?></span></td></tr>
+	<tr><td><span class="bigletters">Cue</span></td><td><span class="bigletters"><?php echo(formatCue($cue)); ?></span></td></tr>
 	
-	<tr><td><span class="bigletters">Guess</span></td><td><span class="bigletters"><?=$guessFormatting?></span></td></tr>
-	<tr><td><span class="bigletters">Answer</span></td><td><span class="bigletters"><?=$answerFormatting?>
+	<tr><td><span class="bigletters">Guess</span></td><td><span class="bigletters"><?php echo($guessFormatting); ?></span></td></tr>
+	<tr><td><span class="bigletters">Answer</span></td><td><span class="bigletters"><?php echo($answerFormatting); ?>
 			
-			&nbsp;&nbsp;<a href="edit.php?MemoryItemIDs=<?=implode(';', $memoryItemIDs)?>">Edit</a>
+			&nbsp;&nbsp;<a href="edit.php?MemoryItemIDs=<?php echo(implode(';', $memoryItemIDs)); ?>">Edit</a>
 			
-			&nbsp;<a href="http://www.dict.cc/?s=<?=urlencode($correctAnswer)?>">dict.cc</a>
+			&nbsp;<a href="http://www.dict.cc/?s=<?php echo(urlencode($correctAnswer)); ?>">dict.cc</a>
 			
 			</span>
 			</td></tr>
@@ -397,9 +396,9 @@ function printRetryForm($memoryItemIDs, $direction, $quizMode) {
   <form name="memoryTestForm" method="POST" action="test.php">
   <input type="submit" name="guess" value="Retest">
 	<script language="JavaScript">document.memoryTestForm.guess.focus();</script>
-  <input type="hidden" name="MemoryItemIDs" value="<?=implode(';', $memoryItemIDs)?>">  
-  <input type="hidden" name="direction" value="<?=$direction?>">    
-  <input type="hidden" name="quizMode" value="<?=$quizMode?>">      
+  <input type="hidden" name="MemoryItemIDs" value="<?php echo(implode(';', $memoryItemIDs)); ?>">  
+  <input type="hidden" name="direction" value="<?php echo($direction); ?>">    
+  <input type="hidden" name="quizMode" value="<?php echo($quizMode); ?>">      
 	</form>
 	<?php	
 }
@@ -440,7 +439,7 @@ function getAnswerRowsForMemoryItem($memoryItem, $cue) {
 	return getSQLRows($sql);  
 }
 
-function printMemoryCue($memoryItemAndDir, $quizMode) {
+function printMemoryCue($memoryItemAndDir, $quizMode) {       
   $memoryItem = $memoryItemAndDir[0];
   $direction = $memoryItemAndDir[1];
   $memorySetID = $memoryItem['MemorySetID'];
@@ -452,28 +451,28 @@ function printMemoryCue($memoryItemAndDir, $quizMode) {
     die('Unexpected direction: ' . $direction);
   }
 
-	$cue = getCueForMemoryItem($memoryItem);
+  $cue = getCueForMemoryItem($memoryItem);
 	
-	$answerRows = getAnswerRowsForMemoryItem($memoryItem, $cue);
+  $answerRows = getAnswerRowsForMemoryItem($memoryItem, $cue);
 
   $answers = extractColumn($answerRows, 0);
-	$correctAnswer = implode('; ', $answers);
+  $correctAnswer = implode('; ', $answers);
 
-	$sql = 
-		'SELECT MemoryItemID FROM memoryitem	' .
-		'WHERE MemorySetID = ' . dbVal($memorySetID) . ' AND DataText IN (' . dbVals($answers) . ')';
-	$memoryItemIDRows = getSQLRows($sql);
-	$memoryItemIDs = implode(';', extractColumn($memoryItemIDRows, 0));	
+  $sql = 
+        'SELECT MemoryItemID FROM memoryitem	' .
+        'WHERE MemorySetID = ' . dbVal($memorySetID) . ' AND DataText IN (' . dbVals($answers) . ')';
+  $memoryItemIDRows = getSQLRows($sql);
+  $memoryItemIDs = implode(';', extractColumn($memoryItemIDRows, 0));	
 	
 ?>
 
-<h1>Memory test for <?=$memorySetName?></h1>
+<h1>Memory test for <?php echo($memorySetName); ?></h1>
 <form name="memoryTestForm" method="POST" action="test.php" style="padding-top:0px">
-<input type=hidden name=quizMode value="<?=$quizMode?>">
+<input type=hidden name=quizMode value="<?php echo($quizMode); ?>">
 <table>
 <tr>
 <td>
-<span class="bigletters"><?=$cue?></span>
+<span class="bigletters"><?php echo $cue; ?></span>
 </td>
 </tr>
 <tr>
@@ -482,23 +481,24 @@ function printMemoryCue($memoryItemAndDir, $quizMode) {
 <input type="text" name="guess" maxlength="255" class="bigletters" style="width:780px" autocomplete="off" 
 	onkeydown="specialCharBoxKeyDown(event, document.memoryTestForm.guess);"
 	onkeypress="specialCharBoxKeyPress(event, document.memoryTestForm.guess);"	
-	onkeyup="specialCharBoxKeyUp(event, document.memoryTestForm.guess);">
+	onkeyup="specialCharBoxKeyUp(event, document.memoryTestForm.guess);"
+        autofocus>
 </span>	
 <script language="JavaScript">document.memoryTestForm.guess.focus();</script>
 <br><br>
 <input type="submit" value="Test">
 
-<input type="hidden" name="correctAnswer" value="<?=htmlspecialchars($correctAnswer)?>">
-<input type="hidden" name="direction" value="<?=$direction?>">
-<input type="hidden" name="cue" value="<?=$cue?>">
-<input type="hidden" name="MemoryItemIDs" value="<?=$memoryItemIDs?>">
-<input type="hidden" name="MemorySetID" value="<?=$memoryItem['MemorySetID']?>">
+<input type="hidden" name="correctAnswer" value="<?php echo(htmlspecialchars($correctAnswer)); ?>">
+<input type="hidden" name="direction" value="<?php echo($direction); ?>">
+<input type="hidden" name="cue" value="<?php echo($cue); ?>">
+<input type="hidden" name="MemoryItemIDs" value="<?php echo($memoryItemIDs); ?>">
+<input type="hidden" name="MemorySetID" value="<?php echo($memoryItem['MemorySetID']); ?>">
 
 </td>
 </tr>
 </table>
 </form>
-<?
+<?php
 }
 
 /******************************** Database Utility Functions *****************************************/
@@ -621,7 +621,7 @@ function getMemoryItemAndDirectionFromID($memoryItemID, $direction) {
 function getNextMemoryItemAndDirection($userID, $memorySetID, $quizMode) {  
   $memorySetRow = getSQLRow(
 		'SELECT ForwardTestRatio, MinCorrectnessRatio, MinNumCorrectInARow, WorkingSetSize, NewVocabRatio ' .
-		'FROM memoryset WHERE MemorySetID = ' . dbVal($memorySetID));
+		'FROM memoryset WHERE MemorySetID = ' . dbVal($memorySetID));  
  	if (!is_array($memorySetRow)) {
  	  die('No memory set for MemorySetID: ' . $memorySetID);
  	} 	
@@ -642,7 +642,7 @@ function getNextMemoryItemAndDirection($userID, $memorySetID, $quizMode) {
 					 'AND memoryhistory.LastTimeTested < ' . 	dbVal($quizStartTime) . ' ' .
 					 'ORDER BY RAND() ' .
 					 'LIMIT 1';
- 	  $memoryItemRow = getSQLRow($sql);  
+ 	  $memoryItemRow = getSQLRow($sql);            
 	}
 
 	if ($quizMode != 1 || $memoryItemRow == false) {
@@ -677,11 +677,12 @@ function getNextMemoryItemAndDirection($userID, $memorySetID, $quizMode) {
 		  $selectCategory = 'NeedsPractice';
 		} else {
 		  $probTestUnlearned = $numUnlearned / $workingSetSize;
-		  
+                  
+                  
 		  if ($numUntested > 0) {    
 			  $probTestUntested = (1 - $probTestUnlearned) * $newVocabRatio;
 			} else {
-			  $probTestUnlearned = $probTestUnlearned + (1 - $probUnlearned) * $newVocabRatio;
+			  $probTestUnlearned = $probTestUnlearned + (1 - $probTestUnlearned) * $newVocabRatio;
 			  $probTestUntested = 0;
 			}
 			
@@ -713,16 +714,17 @@ function getNextMemoryItemAndDirection($userID, $memorySetID, $quizMode) {
 		    $selectCategory = 'Learned';	    
 		  }
 		}
-		
+	                          
 	  /* First look for something that is worse than the minimum correctness ratio. */
+          // Order it by whether it fits the category, but initially, they are all untested.
 	  $sql = 'SELECT memoryitem.MemoryItemID, memoryitem.MemorySetID, ' . 
 					 'memoryitem.CueText, memoryitem.DataText ' .
 	 			   'FROM memoryitempriority ' . 
 	 			   'INNER JOIN memoryitem ON memoryitem.MemoryItemID = memoryitempriority.MemoryItemID ' . 
 				   'WHERE (memoryitempriority.UserID IS NULL OR memoryitempriority.UserID = ' . dbVal($userID) . ')' .  
-					 ' AND memoryitempriority.MemorySetID = ' . dbVal($memorySetID) . ' ' .
-					 ' AND memoryitempriority.Category = ' . dbVal($selectCategory) . ' ' . 
-	 			   'ORDER BY memoryitempriority.NumCorrectInARow, RAND() * CorrectnessRatio ' .
+					 ' AND memoryitempriority.MemorySetID = ' . dbVal($memorySetID) . ' ' .					 
+	 			   'ORDER BY CASE WHEN memoryitempriority.Category = '.dbVal($selectCategory).' THEN 0 ELSE 1 END, ' . 
+                                        'memoryitempriority.NumCorrectInARow, RAND() * CorrectnessRatio ' .
 				   'LIMIT 1';			
 	  $memoryItemRow = getSQLRow($sql);  
 	}
@@ -732,9 +734,11 @@ function getNextMemoryItemAndDirection($userID, $memorySetID, $quizMode) {
 	if ($randFloat <= $forwardTestRatio) {
 	  $direction = FORWARD;
 	} else {
-	  $direction = BACKWARD;
-	}
-    
+            // Backward isn't working well right now.
+	  //$direction = BACKWARD;            
+            $direction = FORWARD;
+	}        
+        
 	return array($memoryItemRow, $direction);
 }
 
@@ -743,27 +747,7 @@ function randFloat() {
 }
 
 function printSound($text) {
-	//$src = 'mary_client.php?in=TEXT_DE&voice=de6&text=' . $text;
-	//echo '<iframe style="height:70px;width:350px;srollbars:none;position:relative;border=0" src="mary_embed.php?src=' . urlencode($src) . '">
-	//</iframe>';
-	/*
-	$src = 'mary_client.php?in=TEXT_DE&voice=de6&text=' . urlencode($text);
-	$embedHTML = '<embed src="' . $src . '" type="audio/x-wav" autostart=true loop=1 height=50 width=300>';
-	echo '<span id=embedspan style="height:70px;width:350px;">&nbsp;</span>';
-	echo '<script language="JavaScript">' .
-		'function writeSound() { ' . 
-		'setTimeout("printSound();",10);' .
-		'} ' . 
-		'function printSound() {' . 
-	  'var oEmbedSpan = document.getElementById("embedspan"); ' .	  
-	  'oEmbedSpan.innerHTML = \'' . $embedHTML . '\'; ' .
-	  'document.memoryTestForm.guess.focus();' . 
-	  '}' .
-		'</script>';
-	*/
-	$src = 'mary_client.php?in=TEXT_DE&voice=de6&text=' . urlencode($text);
-	$embedHTML = '<embed src="' . $src . '" type="audio/x-wav" autostart=true loop=1 height=50 width=300 hidden=true>';
-	echo $embedHTML;	
+    embedMaryGerman($text);
 }
 
 function getStringAlignment($str1, $str2) {    
@@ -795,7 +779,7 @@ function getStringAlignment($str1, $str2) {
 	  }
 	}  	
 
-	$alginment = '';
+	$alignment = '';
 	
 	$i = $len1;
 	$j = $len2;

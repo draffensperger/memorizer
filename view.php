@@ -9,8 +9,6 @@ define("BACKWARD", 2);
 define("TEST_FORM_BODY_ONLOAD", 'document.memoryTestForm.guess.focus();');
 define("RETRY_FORM_BODY_ONLOAD", 'document.retryForm.retestButton.focus();');
 
-while (list($name, $value) = each($HTTP_POST_VARS)) { $input[$name] = stripslashes($value); }
-while (list($name, $value) = each($HTTP_GET_VARS)) { $input[$name] = stripslashes($value); }
 openDBConn();
 printPage($input);
 closeDBConn();

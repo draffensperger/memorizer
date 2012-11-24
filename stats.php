@@ -9,17 +9,15 @@ define("BACKWARD", 2);
 define("TEST_FORM_BODY_ONLOAD", 'document.memoryTestForm.guess.focus();');
 define("RETRY_FORM_BODY_ONLOAD", 'document.retryForm.retestButton.focus();');
 
-while (list($name, $value) = each($HTTP_POST_VARS)) { $input[$name] = stripslashes($value); }
-while (list($name, $value) = each($HTTP_GET_VARS)) { $input[$name] = stripslashes($value); }
 openDBConn();
-printPage($input);
+printPage();
 closeDBConn();
 
-function printPage($input) {
-	if ($input['MemorySetID'] != '') {
-	  printStatsPage($input);
+function printPage() {
+	if (getInput('MemorySetID') != '') {
+	  printStatsPage();
 	} else {
-	  printSelectMemorySetPage($input);
+	  printSelectMemorySetPage();
 	}
 }
 
@@ -35,7 +33,7 @@ function printPageFooter() {
 
 /******************************** Page Print Functions *****************************************/
 
-function printSelectMemorySetPage($input) {
+function printSelectMemorySetPage() {
   printPageHeader();
   echo "<h1>Select Memory Set</h1>\n";
   $memory_sets = getSQLRows('SELECT MemorySetID, MemorySetName FROM memoryset');
@@ -46,7 +44,7 @@ function printSelectMemorySetPage($input) {
 	printPageFooter();
 }
 
-function printStatsPage($input) {
+function printStatsPage() {
 	printPageHeader();  
   
   echo 'Statistics and Memory Items<br>';
