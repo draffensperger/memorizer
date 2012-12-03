@@ -1,5 +1,7 @@
 <?php
 
+define('STATIC_BASE','http://s.dave-r.com/memorizer/');
+
 $input = $_REQUEST;
 
 include 'util.php';
@@ -36,8 +38,8 @@ function printSiteHeader($whichSection, $bodyOnLoad = '', $requiredFields = arra
    <TITLE>Memorizer</TITLE>
    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<meta name="robots" content="all">
-  <LINK href="style.css" rel="stylesheet" type="text/css">
- 	 <script language="javascript" src="specialChars.js">
+  <LINK href="<?php echo STATIC_BASE; ?>style.css" rel="stylesheet" type="text/css">
+ 	 <script language="javascript" src="<?php echo STATIC_BASE; ?>specialChars.js">
  	 </script>
    <script language="javascript">      
       function validate(formObject) {
@@ -97,7 +99,7 @@ function printSiteHeader($whichSection, $bodyOnLoad = '', $requiredFields = arra
 <table cellspacing="0" cellpadding="0" border="0" width="730">
 <tr>
    <td width="100%" colspan=2>
-   <img src="images/banner.png">
+   <img src="<?php echo STATIC_BASE; ?>images/banner.png">
    </td>
 </tr>
 <tr>

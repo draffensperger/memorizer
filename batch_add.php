@@ -75,7 +75,7 @@ function addItemsAndPrintConfirmation($input) {
 		if ($dataText == '' || $cueText == '') {
     	$addStatus = 'Blank';		  
     } else {		        
-		  $sql = 'SELECT COUNT(*) FROM MemoryItem ' .
+		  $sql = 'SELECT COUNT(*) FROM memoryitem ' .
 			'WHERE MemorySetID = ' . dbVal($memorySetID) . 
 			' AND CueText = ' .  dbVal($cueText) . 
 			' AND DataText = ' . dbVal($dataText);
@@ -84,7 +84,7 @@ function addItemsAndPrintConfirmation($input) {
 			if ($countExisting > 0) {
 	    	$addStatus = 'Duplicate';
 			} else {			
-			  $sql = 'INSERT INTO MemoryItem (MemorySetID, DataText, CueText, CueOrder) ' . 
+			  $sql = 'INSERT INTO memoryitem (MemorySetID, DataText, CueText, CueOrder) ' . 
 					'VALUES (' . dbVals(array($memorySetID, $dataText, $cueText)) . ', 1)';	
 		  	execSQL($sql);
 		  	$addStatus = 'Successful';

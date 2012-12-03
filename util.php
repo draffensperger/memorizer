@@ -13,8 +13,16 @@ function openDBConn() {
   global $mysql_password;    
   global $mysql_database;      
 
+  if(usingAppFog()) {
+      $credentials = getAppFogServicesCredentials('mysql-5.1', 'mysql');
+      $mysql_server = $credentials['host'].':'.$credentials['port'];
+      $mysql_user = $credentials['user'];
+      $mysql_password = $credentials['password'];
+	  $mysql_database = $credentials['name'];
+  }  
+  
   global $conn;
-	$conn = mysql_connect($mysql_server, $mysql_user, $mysql_password, true);
+   $conn = mysql_connect($mysql_server, $mysql_user, $mysql_password);
   if (!$conn) {
 	   die('Could not connect: ' . mysql_error());
 	}
@@ -22,6 +30,24 @@ function openDBConn() {
   if (!mysql_select_db($mysql_database, $conn)) {
 	   die('Could not set database: ' . mysql_error());    
   }
+}
+
+function usingAppFog() {
+    return getenv('VCAP_SERVICES') != false;
+}
+
+function getAppFogServicesCredentials($service, $name) {
+    $vcap_services = json_decode(getenv("VCAP_SERVICES"), true);	
+	
+    $servers = $vcap_services[$service];	
+	
+    foreach ($servers as $server) {
+            if ($server['name'] == $name) {
+                    return $server['credentials'];
+            }
+    }
+
+    return null;
 }
 
 function getLastInsertID() {

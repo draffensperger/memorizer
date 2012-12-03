@@ -1,4 +1,4 @@
-INSERT INTO `memorizer`.`memoryset`
+INSERT INTO `memoryset`
 (`MemorySetID`,
 `MemorySetName`,
 `ForwardTestRatio`,
@@ -22,6 +22,7 @@ VALUES
 INSERT INTO `user` (`UserID`, `UserName`) VALUES 
 (1, 'dave');
 
+-- To batch add:
 
 die Katze:cat
 der Hund :dog
