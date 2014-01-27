@@ -9,7 +9,7 @@ function embedMaryTTS($input, $locale) {
 	$key = 'RSpDFAaoQMGRzjU9cjzIl+jn0lrzeFdZMfkDN3Z0C9jOw+2irzht+wJ3pHec/9BoA4R62KaotVad95zhAcJ7Sg==';
 	$keyBytes = base64_decode($key);
 
-	$baseUrl = 'http://tts.dave-r.com/';
+	$baseUrl = 'http://tts.aws.af.cm/';
 	#$baseUrl = 'http://localhost:8080/'
 	
 	$src = $baseUrl . '?';

@@ -1,6 +1,6 @@
 <?php
 
-define('STATIC_BASE','http://s.dave-r.com/memorizer/');
+define('STATIC_BASE','http://media.davidraff.com/memorizer/');
 
 $input = $_REQUEST;
 
