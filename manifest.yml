@@ -1,0 +1,17 @@
+---
+applications:
+  .:
+    name: memorizer
+    framework:
+      name: php
+      info:
+        mem: 128M
+        description: PHP Application
+        exec: 
+    infra: aws
+    url: memorize.aws.af.cm
+    mem: 128M
+    instances: 1
+    services:
+      mysql:
+        type: mysql
