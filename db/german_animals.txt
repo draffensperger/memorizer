@@ -1,0 +1,21 @@
+# Batch add these using the memorizer app
+
+die Katze:cat
+der Hund :dog
+die Giraffe:giraffe
+der Bär:bear
+der Fuchs:fox
+der Löwe:lion
+der Fisch:fish
+der Wal:whale
+der Hai:shark
+der Vogel:bird
+der Adler:eagle
+die Eule:owl
+die Hornisse:hornet
+das Insekt:insect
+die Biene:bee
+der Affe:monkey
+die Fledermaus:bat
+der Tiger:tiger
+die Spinne:spider

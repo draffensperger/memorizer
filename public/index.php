@@ -29,7 +29,7 @@ function printSelectMemorySetPage() {
   $memory_sets = getSQLRows('SELECT MemorySetID, MemorySetName FROM memoryset');
  
 	foreach ($memory_sets as $memory_set) {
-	  echo '<a href="test.php?MemorySetID=' . $memory_set['MemorySetID'] . '">' . $memory_set['MemorySetName'] . '</a><br>';
+	  echo '<a href="quiz.php?MemorySetID=' . $memory_set['MemorySetID'] . '">' . $memory_set['MemorySetName'] . '</a><br>';
 	}
 }
 

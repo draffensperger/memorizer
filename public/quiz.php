@@ -7,8 +7,8 @@ include 'mary_embed.php';
 define("FORWARD", 1);
 define("BACKWARD", 2);
 
-define("TEST_FORM_BODY_ONLOAD", 'writeSound(); ');
-define("RETRY_FORM_BODY_ONLOAD", 'writeSound(); ');
+define("TEST_FORM_BODY_ONLOAD", '');
+define("RETRY_FORM_BODY_ONLOAD", '');
 
 openDBConn();
 printPage();
@@ -47,7 +47,7 @@ function printSelectMemorySetPage() {
   $memory_sets = getSQLRows('SELECT MemorySetID, MemorySetName FROM memoryset');
  
 	foreach ($memory_sets as $memory_set) {
-	  echo '<a href="test.php?MemorySetID=' . $memory_set['MemorySetID'] . '">' . $memory_set['MemorySetName'] . '</a><br>';
+	  echo '<a href="quiz.php?MemorySetID=' . $memory_set['MemorySetID'] . '">' . $memory_set['MemorySetName'] . '</a><br>';
 	}
 	printPageFooter();
 }
@@ -393,7 +393,7 @@ function printResultTable($isCorrect, $cue, $guess, $correctAnswer, $memoryItemI
 
 function printRetryForm($memoryItemIDs, $direction, $quizMode) {	  
   ?>
-  <form name="memoryTestForm" method="POST" action="test.php">
+  <form name="memoryTestForm" method="POST" action="quiz.php">
   <input type="submit" name="guess" value="Retest">
 	<script language="JavaScript">document.memoryTestForm.guess.focus();</script>
   <input type="hidden" name="MemoryItemIDs" value="<?php echo(implode(';', $memoryItemIDs)); ?>">  
@@ -467,7 +467,7 @@ function printMemoryCue($memoryItemAndDir, $quizMode) {
 ?>
 
 <h1>Memory test for <?php echo($memorySetName); ?></h1>
-<form name="memoryTestForm" method="POST" action="test.php" style="padding-top:0px">
+<form name="memoryTestForm" method="POST" action="quiz.php" style="padding-top:0px">
 <input type=hidden name=quizMode value="<?php echo($quizMode); ?>">
 <table>
 <tr>
