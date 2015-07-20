@@ -1,36 +1,36 @@
 <?php
 $url = parse_url(getenv("CLEARDB_DATABASE_URL"));
 
-$mysql_server = $url["host"];
-$mysql_user = $url["user"];
-$mysql_password = $url["pass"];
-$mysql_database = substr($url["path"], 1);
+$mysqli_server = $url["host"];
+$mysqli_user = $url["user"];
+$mysqli_password = $url["pass"];
+$mysqli_database = substr($url["path"], 1);
 
 // The database connection
 $conn = '';
 
 function openDBConn() {
-  global $mysql_server;
-  global $mysql_user;
-  global $mysql_password;    
-  global $mysql_database;      
+  global $mysqli_server;
+  global $mysqli_user;
+  global $mysqli_password;    
+  global $mysqli_database;      
 
   if(usingAppFog()) {
     $credentials = getAppFogServicesCredentials('mysql-5.1', 'mysql');
-    $mysql_server = $credentials['host'].':'.$credentials['port'];
-    $mysql_user = $credentials['user'];
-    $mysql_password = $credentials['password'];
-    $mysql_database = $credentials['name'];
+    $mysqli_server = $credentials['host'].':'.$credentials['port'];
+    $mysqli_user = $credentials['user'];
+    $mysqli_password = $credentials['password'];
+    $mysqli_database = $credentials['name'];
   }  
 
   global $conn;
-  $conn = mysql_connect($mysql_server, $mysql_user, $mysql_password);
+  $conn = mysqli_connect($mysqli_server, $mysqli_user, $mysqli_password);
   if (!$conn) {
-    die('Could not connect: ' . mysql_error());
+    die('Could not connect: ' . mysqli_connect_error());
   }
 
-  if (!mysql_select_db($mysql_database, $conn)) {
-    die('Could not set database: ' . mysql_error());    
+  if (!mysqli_select_db($conn, $mysqli_database)) {
+    die('Could not set database: ' . mysqli_error($conn));    
   }
 }
 
@@ -54,14 +54,14 @@ function getAppFogServicesCredentials($service, $name) {
 
 function getLastInsertID() {
   global $conn;
-  return mysql_insert_id($conn);
+  return mysqli_insert_id($conn);
 }
 
 function getSQLScalar($sql) {
   global $conn;
 
-  $result = mysql_query($sql, $conn) or die("Error in query: $sql." . mysql_error($conn));
-  $row = mysql_fetch_row($result);  
+  $result = mysqli_query($conn, $sql) or die("Error in query: $sql." . mysqli_error($conn));
+  $row = mysqli_fetch_row($result);  
 
   return $row[0];
 }
@@ -70,8 +70,8 @@ function getSQLScalar($sql) {
 function getSQLRows($sql) {
   global $conn;
 
-  $result = mysql_query($sql, $conn) or die("Error in query: $sql." . mysql_error($conn));
-  return mysql_fetch_all($result);  
+  $result = mysqli_query($conn, $sql) or die("Error in query: $sql." . mysqli_error($conn));
+  return mysqli_fetch_all($result, MYSQLI_ASSOC);  
 }
 
 // Returns a single row as an array that can be referenced as array["<field name>"] for the 
@@ -79,8 +79,8 @@ function getSQLRows($sql) {
 function getSQLRow($sql) {
   global $conn;
 
-  $result = mysql_query($sql, $conn) or die("Error in query: $sql." . mysql_error($conn));
-  return mysql_fetch_assoc($result);
+  $result = mysqli_query($conn, $sql) or die("Error in query: $sql." . mysqli_error($conn));
+  return mysqli_fetch_assoc($result);
 }
 
 function getSQLMap($sql, $keyField, $valueField) {
@@ -112,7 +112,7 @@ function getSQLColumn($sql) {
 function execSQL($sql) {
   global $conn;
 
-  mysql_query($sql, $conn) or die("Error in query: $sql." . mysql_error($conn));
+  mysqli_query($conn, $sql) or die("Error in query: $sql." . mysqli_error($conn));
 }
 
 function dbVals($vals) {
@@ -196,14 +196,7 @@ function updateUsingAssoc($table, $dataAssoc, $fields, $keyField, $keyValue) {
 function closeDBConn() {
   global $conn;
 
-  mysql_close($conn);
-}
-
-/* Custom function to get a full list of results. */
-function mysql_fetch_all($result) {
-  $all = array();
-  while ($all[] = mysql_fetch_assoc($result)) {}
-  return $all;
+  mysqli_close($conn);
 }
 
 ?>
